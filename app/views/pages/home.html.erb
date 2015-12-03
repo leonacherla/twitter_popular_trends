@@ -1,0 +1,143 @@
+
+<div id="container" class="container-fluid">
+
+
+	<div class="row">
+
+
+		<div id="mapcontainer" class="col-md-6">	
+			<div id="map">
+			</div>
+		</div>
+
+		<aside class="col-md-6">
+			
+			<div id="topics" class="col-md-4">
+				<h4>Trending topics</h4>
+				<ul id="topiclist">
+					
+				</ul>
+			</div>
+
+			<div id="tweets" class="col-md-8">
+			<h4>Tweets</h4>
+				
+				<form class="navbar-form navbar-left" role="search">
+					<div class="form-group">
+						<input type="text" class="form-control" placeholder="Search">
+					</div>
+					<button type="submit" id="submitBtn" class="btn btn-default">Submit</button>
+				</form>
+
+				<div class="clearfix"></div>
+
+				<ul id="SearchResults">
+					
+				</ul>
+
+				
+				
+				<ul id="list">
+				</ul>
+			</div>
+	
+		</aside>
+
+	</div> <!-- end row -->
+	
+</div>
+
+
+<script type="text/template" id="tmplAvailable">
+	<li><a href="#" class="loc"><%%= city.name %> : <%%= city.woeid %> lat: <%%= city.lat %> long: <%%= city.long %> </a> </li>
+</script>
+
+<script type="text/template" id="tmplTop10">
+	<li><a href="#" class="topicname" class="topic"> <%%= name %> </a> </li>		
+</script>
+
+<script type="text/template" id="tmplSearchResults" >
+	<li> <a href="https://twitter.com/<%%= tweet.user.screen_name%>"> <strong><%%= tweet.user.name %></strong> <italic>@<%%= tweet.user.screen_name %></italic> </a>  <br> <%%= tweet.linkedText %></li> <br>
+</script>
+
+<script>
+
+	
+	var submitBtn = $('#submitBtn');
+	var searchInput = $('input.form-control');
+
+	// SEARCH FUNCTION
+
+	submitBtn.on('click', function(event){
+		event.preventDefault();
+		
+		$.ajax({
+			url: '/trends/search/' + encodeURIComponent(searchInput.val())
+		}).done(function(data){
+			
+			var tmplMarkup = $('#tmplSearchResults').html();
+
+			console.log(data);
+			// clear the div
+			$('#SearchResults').html('');
+
+			$.each(data, function(index){
+				var compiledTmpl = _.template(tmplMarkup);
+
+				var linkedText = window.twttr.txt.autoLink(data[index].text);
+
+				data[index].linkedText = linkedText;
+				var html = compiledTmpl({tweet : data[index]});
+
+				$('#SearchResults').append(html);
+				// $('#SearchResults').append(data[index].text);
+				// console.log(data[index].text);
+			});
+		});
+
+	}); // end search submit click event
+
+
+	// clicked topic goes into search bar 
+	// $('.topicname').on('click', function(event){
+	// 			event.preventDefault();
+
+	// 			var topic = $(this).html();
+
+	// 			console.log(topic);
+
+	// 			searchInput.val(topic);
+
+	// 		});
+
+
+</script>
+
+
+<script>
+
+
+	// $.ajax({
+	// 	url: "/trends"
+	// }).done(function(data){
+	// 	//cities = data;
+	// 	var tmplMarkup = $('#tmplAvailable').html();
+
+	// 	$.each(data, function(index, city) {			
+	// 		var compiledTmpl = _.template(tmplMarkup, {city : city});
+	// 		$('#list').append(compiledTmpl);
+	// 	});
+		
+	// });
+
+	// $.ajax({
+	// 	url: "/trends/place/"
+	// }).done(function(data){
+	// 	var tmplMarkup = $('#tmplTop10').html();
+
+		
+	// 	$("").html();
+	// });
+
+
+</script>
